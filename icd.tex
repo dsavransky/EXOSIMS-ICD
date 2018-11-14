@@ -290,6 +290,7 @@ The JSON specification file will contain a series of objects with members enumer
         0.1,
         100.0
     ],
+    "cachedir": "path/to/desired/cache/directory",
     "charMargin": 0.15,
     "checkKeepoutEnd": true,
     "coMass": 5800.0,
@@ -613,6 +614,7 @@ These parameters apply to all simulations. These parameters define the scope of 
 \item[WAint] (float) Working angle used for integration time calculation in units of $arcsec$.
 \item[dMagint] (float) Delta magnitude used for integration time calculation.
 \item[dt\_max] (float) The maximum time for a revisit window in units of weeks.
+\item[cachedir] (string) path to desired cache directory (default is \texttt{\$HOME/.EXOSIMS/cache})
 
 
 \end{itemize}
@@ -669,6 +671,7 @@ The Star Catalog prototype creates empty 1D NumPy ndarrays for each of the outpu
     \item[pmra (astropy Quantity array)] \hfill \\ Proper motion in right ascension in units of $ mas/year $
     \item[pmdec (astropy Quantity array)] \hfill \\ Proper motion in declination in units of $ mas/year $
     \item[rv (astropy Quantity array)] \hfill \\ Radial velocity in units of $ km/s $
+    \item[cachedir (string)] \hfill \\ Path to cache directory
 \end{description}
 \end{itemize}
 
@@ -732,6 +735,7 @@ The following are all entries in the passed specs dictionary (derived from the J
     \item[eta (float)] \hfill \\ The average occurrence rate of planets per star for the entire population.
     \item[uniform (float, callable)] \hfill \\ Uniform distribution over a given range.
     \item[logunif (float, callable)] \hfill \\ Log-uniform distribution over a given range.
+    \item[cachedir (string)] \hfill \\ Path to cache directory.
 \end{description}
 \end{itemize}
 
@@ -757,7 +761,7 @@ The methods are:
 % PLANET PHYSICAL MODEL 
 
 \subsection{Planet Physical Model} \label{sec:planetphysicalmodel}
-The Planet Physical Model module contains models of the light emitted or reflected by planets in the wavelength bands under investigation by the current mission simulation.  It takes as inputs the physical quantities sampled from the distributions in the Planet Population module and generates synthetic spectra (or band photometry, as appropriate).  The specific implementation of this module can vary greatly, and can be based on any of the many available planetary geometric albedo, spectra and phase curve models.  As required, this module also provides physical models relating dependent parameters that cannot be sampled independently (for example density models relating plant mass and radius).  While the specific methods will depend highly on the physical models being used, the prototype provides four stubs that will be commonly useful:
+The Planet Physical Model module contains models of the light emitted or reflected by planets in the wavelength bands under investigation by the current mission simulation.  It takes as inputs the physical quantities sampled from the distributions in the Planet Population module and generates synthetic spectra (or band photometry, as appropriate).  The specific implementation of this module can vary greatly, and can be based on any of the many available planetary geometric albedo, spectra and phase curve models.  This module contains the attribute \texttt{cachedir}, the path to the cache directory. As required, this module also provides physical models relating dependent parameters that cannot be sampled independently (for example density models relating plant mass and radius).  While the specific methods will depend highly on the physical models being used, the prototype provides four stubs that will be commonly useful:
 \begin{itemize}[leftmargin=2in,font={\ttfamily}]
     \item[\texttt calc\_albedo\_from\_sma] Calculate planetary geometric albedo as a function of the semi-major axis. (see \S\ref{sec:calcalbedofromsmatask})
     \item[\texttt calc\_radius\_from\_mass] Calculate planetary radii from their masses (see \S\ref{sec:calcradiusfrommasstask}).
@@ -984,6 +988,7 @@ These will always be present in an OpticalSystem object and directly accessible 
     \item[scienceInstruments (list of dicts)] \hfill \\  List of dictionaries containing all supplied science instrument attributes.  Typically the first instrument will be the imager, and the second the spectrograph (IFS). Only required attribute is `name'.  See above for other commonly used attributes. 
     \item[starlightSuppressionSystems (list of dicts)] \hfill \\  List of dictionaries containing all supplied starlight suppression system attributes. Typically the first system will be used with the imager, and the second with the IFS. Only required attribute is `name'. See above for other commonly used attributes.
     \item[observingModes (list of dicts)] \hfill \\  List of dictionaries containing all mission observing modes. Only required attribute are `instName' and `systName'. See above for other commonly used attributes.
+    \item[cachedir (string)] \hfill \\ Path to cache directory.
 \end{description}
 \end{itemize}
 
@@ -1163,6 +1168,7 @@ The Zodiacal Light module contains methods to calculate the zodiacal light surfa
     \item[varEZ (float)] \hfill \\ Exo-zodiacal light variation (variance of log-normal distribution)
     \item[fZ0 (astropy Quantity)] \hfill \\ Default surface brightness of zodiacal light in units of $ 1/arcsec^2 $ 
     \item[fEZ0 (astropy Quantity)] \hfill \\ Default surface brightness of exo-zodiacal light in units of $ 1/arcsec^2 $ 
+    \item[cachedir (string)] \hfill \\ Path to cache directory
 \end{description}
 \end{itemize}
 
@@ -1284,7 +1290,7 @@ Finds the minimum zodiacal light values for each star over an entire earth orbit
 
 \subsection{Background Sources}\label{sec:backgroundsources}
 
-The Background Sources module provides density of background sources for a given target based on its coordinates and the integration depth. The integration depth is the limiting planet magnitude, that is the magnitude of the faintest planet we can observe. This will be used in the post-processing module to determine false alarms based on confusion.  The prototype module has no inputs and only a single function: \verb+dNbackground+ (see \S\ref{sec:dNbackgroundtask}).
+The Background Sources module provides density of background sources for a given target based on its coordinates and the integration depth. The integration depth is the limiting planet magnitude, that is the magnitude of the faintest planet we can observe. This will be used in the post-processing module to determine false alarms based on confusion.  The prototype module has no inputs, the attribute \texttt{cachedir} (path to the cache directory), and only a single function: \verb+dNbackground+ (see \S\ref{sec:dNbackgroundtask}).
 
 \subsubsection{dNbackground Method} \label{sec:dNbackgroundtask}
 Returns background source number densities
@@ -1345,6 +1351,7 @@ The Post-Processing module contains the \verb+det_occur+ method (see \S\ref{sec:
     \item[MDP (float)] \hfill \\ Missed detection probability
     \item[ppFact (float, callable)] \hfill \\ Post-processing contrast factor, between 0 and 1.
     \item[FAdMag0 (float, callable)] \hfill \\ Minimum delta magnitude that can be obtained by a false alarm.
+    \item[cachedir (string)] \hfill \\ Path to cache directory
 \end{description}
 \end{itemize}
 
@@ -1407,6 +1414,7 @@ Monte Carlo methods for calculating completeness will require an input of the nu
     \item[PlanetPhysicalModel (PlanetPhysicalModel module)] \hfill \\ PlanetPhysicalModel module object (see \ref{sec:planetphysicalmodel}) 
     \item[dMagLim (float)] \hfill \\ Limiting planet-to-star delta magnitude for completeness
     \item[minComp (float)] \hfill \\ Minimum completeness value for inclusion in target list
+    \item[cachedir (string)] \hfill \\ Path to cache directory
 \end{description}
 \end{itemize}
 
@@ -1589,6 +1597,7 @@ The TargetList module contains the following methods:
     \item[MsEst (float ndarray)] \hfill \\ Approximate stellar mass in $ M_{sun} $
     \item[MsTrue (float ndarray)] \hfill \\ Stellar mass with an error component included in $ M_{sun} $
     \item[nStars (int)] \hfill \\ Number of target stars
+    \item[cachedir (string)] \hfill \\ Path to cache directory
 \end{description}
 \end{itemize}
 
@@ -1752,6 +1761,7 @@ All planetary parameters are generated in the constructor via calls to the appro
     \item[fEZ (astropy Quantity array)] \hfill \\ Surface brightness of exozodiacal light in units of $ 1/arcsec2 $, determined from \verb+ZodiacalLight.fEZ+ \S\ref{sec:fEZtask}
     \item[dMag (float ndarray)] \hfill \\ Differences in magnitude between planets and their host star
     \item[WA (astropy Quantity array)] \hfill \\ Working angles of the planets of interest in units of $arcsec$
+    \item[cachedir (string)] \hfill \\ Path to cache directory
 \end{description}
 \end{itemize}
 
@@ -2007,6 +2017,7 @@ The input and output of the Observatory module methods are depicted in \reffig{f
     \item[obe (lambda function)] \hfill \\ A lambda function for calculating the obliquity of the ecliptic
     \item[kernel (jplephem object)] \hfill \\ The spk ephemeris, exists only if havejplephem is True
     \item[planets (list of dict)] \hfill \\ A dictionary containing the planets names
+    \item[cachedir (string)] \hfill \\ Path to cache directory
 \end{description}
 \end{itemize}
 
@@ -2479,7 +2490,7 @@ The input, output and updated attributes of the Time Keeping methods are depicte
     \item[OBstartTimes (astropy Quantity array)] \hfill \\ Array containing the normalized start times of each observing block throughout the mission, in units of $day$
     \item[OBendTimes (astropy Quantity array)] \hfill \\ Array containing the normalized end times of each observing block throughout the mission, in units of $day$
     \item[exoplanetObsTime (astropy Quantity)] \hfill \\ Tracks instrument time used in units of $day$
-
+    \item[cachedir (string)] \hfill \\ Path to cache directory
 \end{description}
 \end{itemize}
 
@@ -2682,6 +2693,7 @@ The input, output and updated attributes of the Survey Simulation methods are de
     \item[seed (integer)] \hfill \\ Random seed used to make all random number generation reproducible.
     \item[WAint (float)] \hfill \\ Working angle used for integration time calculation in units of $arcsec$.
     \item[dMagint (float)] \hfill \\ Delta magnitude used for integration time calculation.
+    \item[cachedir (float)] \hfill \\ Path to desired cache directory (default will be \texttt{\$HOME/.EXOSIMS/cache}).
 \end{description}
 \end{itemize}
 
@@ -2717,6 +2729,7 @@ The input, output and updated attributes of the Survey Simulation methods are de
     \item[dMagint (float ndarray)] \hfill \\ Delta magnitude used for integration time calculation
     \item[valfZmin (astropy Quantity array)] \hfill \\ value of minimum zodiacal light with units 1/arcsec$^2$
     \item[absTimefZmin (astropy Time array)] \hfill \\ absolute time in MJD and tai that minimum zodiacal light will occur next
+    \item[cachedir (string)] \hfill \\ Path to cache directory
 \end{description}
 \end{itemize}
 
