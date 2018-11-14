@@ -1,6 +1,5 @@
 %!TEX TS-program = pdflatexmk
 \documentclass[cleanfoot]{asme2ej}
-
 \usepackage[]{graphicx}
 \graphicspath{ {images/} }
 
@@ -95,10 +94,10 @@ The terminology used to describe the software implementation is loosely based up
 \begin{figure}[ht]
     \begin{center}
         \begin{tabular}{c}
-             \includegraphics[width=0.7\textwidth]{instantiation_tree1}
+             \includegraphics[width=0.95\textwidth]{instantiation_tree2b}
         \end{tabular}
     \end{center}
-    \caption{Schematic depiction of the instantiation path of all EXOSIMS modules.  The entry point to SurveySimulation is the construction of a MissionSim object, which causes the instantiation of all other module objects.  All objects are instantiated in the order shown here, with SurveySimulation and SurveyEnsemble constructed last.  The arrows indicate calls to the object constructor, and object references to each module are always passed up directly to the top calling module, so that at the end of construction, the MissionSim object has direct access to all other modules as its attributes.}
+    \caption{Schematic depiction of the instantiation path of all EXOSIMS modules.  The arrows indicate calls to the object constructor, and object references to each module are always passed up directly to the top calling module, so that a given module has access to any other module connected to it by a direct path of instantiations. For example, the TargetList module has access to both the PostProcessing and BackgroundSources modules, while the Observatory module does not have access to any other modules. The typical entry point to EXOSIMS is the  construction of a MissionSim object, which causes the instantiation of the SurveySimulation module, which in turn instnatiates all the other modules. In the case of a parallelize SurveyEnsemble instnatiation, multiple, independent SurveySimulation modules are instantiated at the same time.  At the end of construction, the MissionSim and SurveySimulation objects have direct access to all other modules as their attributes.}
     \label{fig:instantiation_tree}
 \end{figure}
 
@@ -1704,7 +1703,8 @@ The \verb+stellarTeff+ method calculates the effective stellar temperature based
 \subsection{Simulated Universe} \label{sec:simulateduniverse}
 The Simulated Universe module instantiates the Target List module and creates a synthetic universe by populating planetary systems about some or all of the stars in the target list.  For each target, a planetary system is generated based on the statistics encoded in the Planet Population module, so that the overall planet occurrence and multiplicity rates are consistent with the provided distribution functions.  Physical parameters for each planet are similarly sampled from the input density functions (or calculated via the Planet physical model).  All planetary orbital and physical parameters are encoded as arrays of values, with an indexing array (pInds) that maps planets to the stars in the target list. 
 
-All planetary parameters are generated in the constructor via calls to the appropriate value generating functions in the planet population module. The input and updated attributes of the Simulated Universe methods are depicted in \reffig{fig:simulateduniversemodule}. The Simulated Universe module contains the following methods: 
+All planetary parameters are generated in the constructor via calls to the appropriate value generating functions in the planet population module.%The input and updated attributes of the Simulated Universe methods are depicted in \reffig{fig:simulateduniversemodule}. 
+The Simulated Universe module contains the following methods: 
 
 \begin{itemize}[leftmargin=2in,font={\ttfamily}]
     \item[\texttt gen\_physical\_properties] Populates the orbital elements and physical characteristics of all planets (see \S\ref{sec:genphysicalpropertiestask})
@@ -1940,7 +1940,7 @@ Finally, the \verb+distForces+ method determines the lateral and axial disturban
 
 In addition to these methods, the observatory definition can also encode finite resources used by the observatory throughout the mission.  The most important of these is the fuel used for stationkeeping and repointing, especially in the case of occulters which must move significant distances between observations.  Other considerations could include the use of other volatiles such as cryogens for cooled instruments, which tend to deplete solely as a function of mission time.  This module also allows for detailed investigations of the effects of orbital design on the science yield, e.g., comparing the original baseline geosynchronous 28.5\textdegree{} inclined orbit for WFIRST with an L2 halo orbit, which is the new mission baseline. 
 
-The input and output of the Observatory module methods are depicted in \reffig{fig:observatorymodule}.
+%The input and output of the Observatory module methods are depicted in \reffig{fig:observatorymodule}.
 
 % \begin{figure}[ht]
 %     \begin{center}
@@ -2021,7 +2021,7 @@ The input and output of the Observatory module methods are depicted in \reffig{f
 \end{description}
 \end{itemize}
 
-\subsubsection{equat2eclip Method} \label{}
+\subsubsection{equat2eclip Method} \label{sec:equat2eclip}
 Rotates heliocentric coordinates from equatorial frame to ecliptic frame
 \subsubsection*{Input}
 \begin{itemize}
@@ -2040,7 +2040,7 @@ Rotates heliocentric coordinates from equatorial frame to ecliptic frame
 \end{description}
 \end{itemize}
 
-\subsubsection{eclip2equat Method} \label{}
+\subsubsection{eclip2equat Method} \label{sec:eclip2equat}
 Rotates heliocentric coordinates from ecliptic to equatorial frame.
 \subsubsection*{Input}
 \begin{itemize}
@@ -2160,7 +2160,7 @@ This function should only be called by calculate\_observableTimes. *For No Occul
 \end{description}
 \end{itemize}
 
-\subsubsection{star\_angularSep Method} \label{}
+\subsubsection{star\_angularSep Method} \label{sec:starangsep}
 Finds angular separation from old star to given list of stars.
 \subsubsection*{Input}
 \begin{itemize}
@@ -2200,7 +2200,7 @@ If jplephem is not present, the Observatory prototype will load static ephemeris
 \end{description}
 \end{itemize}
 
-\subsubsection{spk\_body Method} \label{}
+\subsubsection{spk\_body Method} \label{sec:spkbody}
 Finds solar system body positions vector in heliocentric equatorial (default) or ecliptic frame for current time (MJD).
 \subsubsection*{Input}
 \begin{itemize}
@@ -2219,7 +2219,7 @@ Finds solar system body positions vector in heliocentric equatorial (default) or
 \end{description}
 \end{itemize}
 
-\subsubsection{keplerplanet Method} \label{}
+\subsubsection{keplerplanet Method} \label{sec:keplerplanet}
 Finds solar system body positions vector in heliocentric equatorial (default) or ecliptic frame for current time (MJD).
 \subsubsection*{Input}
 \begin{itemize}
@@ -2238,7 +2238,7 @@ Finds solar system body positions vector in heliocentric equatorial (default) or
 \end{description}
 \end{itemize}
 
-\subsubsection{moon\_earth Method} \label{}
+\subsubsection{moon\_earth Method} 
 Finds geocentric equatorial positions vector for Earth's moon using Algorithm 31 from Vallado 2013 to find the geocentric equatorial positions vector for Earth's moon.
 \subsubsection*{Input}
 \begin{itemize}
@@ -2255,7 +2255,7 @@ Finds geocentric equatorial positions vector for Earth's moon using Algorithm 31
 \end{description}
 \end{itemize}
 
-\subsubsection{cent Method} \label{}
+\subsubsection{cent Method} 
 Finds time in Julian centuries since J2000 epoch. This quantity is needed for many algorithms from Vallado 2013.
 \subsubsection*{Input}
 \begin{itemize}
@@ -2272,7 +2272,7 @@ Finds time in Julian centuries since J2000 epoch. This quantity is needed for ma
 \end{description}
 \end{itemize}
 
-\subsubsection{propeph Method} \label{}
+\subsubsection{propeph Method} 
 Propagates an ephemeris from Vallado 2013 to current time.
 \subsubsection*{Input}
 \begin{itemize}
@@ -2290,7 +2290,7 @@ Propagates an ephemeris from Vallado 2013 to current time.
 \end{description}
 \end{itemize}
 
-\subsubsection{rot Method} \label{}
+\subsubsection{rot Method} 
 Finds the rotation matrix of angle th about the axis value
 \subsubsection*{Input}
 \begin{itemize}
@@ -2328,7 +2328,7 @@ The \verb+distForces+ method finds lateral and axial disturbance forces on an oc
 \end{description}
 \end{itemize}
 
-\subsubsection{mass\_dec Method} \label{}
+\subsubsection{mass\_dec Method} 
 Returns mass used and deltaV, the values returned by this method are used to decrement spacecraft mass for station-keeping.
 \subsubsection*{Input}
 \begin{itemize}
@@ -2348,7 +2348,7 @@ Returns mass used and deltaV, the values returned by this method are used to dec
 \end{description}
 \end{itemize}
 
-\subsubsection{mass\_dec\_sk Method} \label{}
+\subsubsection{mass\_dec\_sk Method} 
 Returns mass used, deltaV and disturbance forces. This method calculates all values needed to decrement spacecraft mass for station-keeping.
 \subsubsection*{Input}
 \begin{itemize}
@@ -2372,7 +2372,7 @@ Returns mass used, deltaV and disturbance forces. This method calculates all val
 \end{description}
 \end{itemize}
 
-\subsubsection{calculate\_dV Method} \label{}
+\subsubsection{calculate\_dV Method} 
 Finds the change in velocity needed to transfer to a new star line of sight. This method sums the total delta-V needed to transfer from one star line of sight to another. It determines the change in velocity to move from one station-keeping orbit to a transfer orbit at the current time, then from the transfer orbit to the next station-keeping orbit at currentTime + dt. Station-keeping orbits are modeled as discrete boundary value problems. This method can handle multiple indeces for the next target stars and calculates the dVs of each trajectory from the same starting star.
 \subsubsection*{Input}
 \begin{itemize}
@@ -2393,7 +2393,7 @@ Finds the change in velocity needed to transfer to a new star line of sight. Thi
 \end{description}
 \end{itemize}
 
-\subsubsection{calculate\_slewTimes Method} \label{}
+\subsubsection{calculate\_slewTimes Method} 
 Finds slew times and separation angles between target stars. This method determines the slew times of an occulter spacecraft needed to transfer from one star's line of sight to all others in a given target list.
 \subsubsection*{Input}
 \begin{itemize}
@@ -2415,7 +2415,7 @@ Finds slew times and separation angles between target stars. This method determi
 \end{description}
 \end{itemize}
 
-\subsubsection{log\_occulterResults Method} \label{}
+\subsubsection{log\_occulterResults Method} 
 Updates the given DRM to include occulter values and results
 \subsubsection*{Input}
 \begin{itemize}
@@ -2442,7 +2442,8 @@ Updates the given DRM to include occulter values and results
 \subsection{Time Keeping} \label{sec:timekeeping}
 The Time Keeping module is responsible for keeping track of the current mission time, exoplanet observation time, and observing blocks.  It encodes the mission start time, mission life, mission portion, mission end time, current time within a simulation, start times of observing blocks, end times of observing blocks, observation block number, and observation time counted towards an instrument.  All functions in all modules requiring knowledge of the current time call functions or access parameters implemented within the Time module.  Internal encoding of time is implemented as the time from mission start (measured in units of $ day $).  The Time Keeping module also provides functionality for converting between this time measure and standard measures such as Julian Day Number and UTC time.
  
-The input, output and updated attributes of the Time Keeping methods are depicted in \reffig{fig:timekeepingmodule}. The Time Keeping module contains six methods:
+%The input, output and updated attributes of the Time Keeping methods are depicted in \reffig{fig:timekeepingmodule}. 
+The Time Keeping module contains six methods:
 \begin{itemize}[leftmargin=1.5in,font={\ttfamily}]
     \item[\texttt init\_OB] Initializes the mission observing blocks (see \S\ref{sec:initobtask})
     \item[\texttt mission\_is\_over] Evaluates whether the mission is over given the current timekeeping values (see \S\ref{sec:missionisovertask})
@@ -2654,7 +2655,8 @@ Calculates the maximum integration times possible without exceeding allocate\_ti
 \subsection{Survey Simulation} \label{sec:surveysim}
 This is the module that performs a specific simulation based on all of the input parameters and models. This module returns the mission timeline - an ordered list of simulated observations of various targets on the target list along with their outcomes.  The output also includes an encoding of the final state of the simulated universe (so that a subsequent simulation can start from where a previous simulation left off) and the final state of the observatory definition (so that post-simulation analysis can determine the percentage of volatiles expended, and other engineering metrics).
 
-The input, output and updated attributes of the Survey Simulation methods are depicted in \reffig{fig:surveysimulationmodule}. The Survey Simulation module contains the following methods:
+%The input, output and updated attributes of the Survey Simulation methods are depicted in \reffig{fig:surveysimulationmodule}. 
+The Survey Simulation module contains the following methods:
 \begin{itemize}[leftmargin=2.5in,font={\ttfamily}]
     \item[\texttt run\_sim] Performs the survey simulation (see \S\ref{sec:runsimtask})
     \item[\texttt next\_target] Finds index of next target star and calculates its integration time (see \S\ref{sec:nexttargettask}) - called by \verb+run_sim+
@@ -3057,7 +3059,7 @@ Refines the selection of occulter slew times by filtering based on mission time 
 \end{description}
 \end{itemize}
 
-\subsubsection{filterOcculterSlews Method} \label{sec:refineOcculterSlewstask}
+\subsubsection{filterOcculterSlews Method} \label{sec:filterOcculterSlewstask}
 Used by the refineOcculterSlews method when slew times have been selected a priori. This method filters out slews that are not within desired observing blocks, the maximum allowed integration time, and are within future keepouts.
 \subsubsection*{Input}
 \begin{itemize}
@@ -3107,7 +3109,7 @@ Used by the refineOcculterSlews method when slew times have not been selected, a
 \end{itemize}
 
 
-\subsubsection{selectOcculterSlews Method} \label{sec:findAllowableOcculterSlewstask}
+\subsubsection{selectOcculterSlews Method} \label{sec:selectOcculterSlewstask}
 After finding a range of allowable slew times, this method selects the best slew time for each star based on desired criteria. Slew times for the default method are selected which allow the maximum possible amount of characterization time for each star should there be a detection. 
 
 \subsubsection*{Input}
@@ -3154,7 +3156,7 @@ The parallel implementation in the Prototype is geared towards an ipyparallel-ba
 \end{description}
 \end{itemize}
 
-\subsubsection{run\_ensemble Method} \label{}
+\subsubsection{run\_ensemble Method} 
 \subsubsection*{Input}
 \begin{itemize}
 \item
@@ -3175,7 +3177,7 @@ The parallel implementation in the Prototype is geared towards an ipyparallel-ba
 \end{description}
 \end{itemize}
 
-\subsubsection{run\_one Method} \label{}
+\subsubsection{run\_one Method} 
 
 \subsubsection*{Input}
 \begin{itemize}

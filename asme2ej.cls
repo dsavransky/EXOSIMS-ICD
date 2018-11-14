@@ -1365,5 +1365,3 @@
 \endinput
 
 % End of Class
-
-
