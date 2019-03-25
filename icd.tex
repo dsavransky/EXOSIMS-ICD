@@ -866,7 +866,7 @@ The starlight suppression system throughput and contrast - or residual intensity
 
 By definition, the detection mode IWA correspond to the working angle at which integration times are calculated during the detection phase. This IWA must not be confused with the global IWA. There are 3 types of IWA/OWA:\\
 1- Each coronagraph has its own IWA/OWA in arcsec defined at its operation wavelength.\\
-2- Each observing mode has its own IWA/OWA, based on the coronagraph IWA/OWA and rescaled to the modeâs specific wavelength. For simple cases where no observing modes are specified, the detection IWA will simply correspond to the coronagraph IWA.\\
+2- Each observing mode has its own IWA/OWA, based on the coronagraph IWA/OWA and rescaled to the model's specific wavelength. For simple cases where no observing modes are specified, the detection IWA will simply correspond to the coronagraph IWA.\\
 3- A global IWA/OWA can be specified for the whole telescope, to filter out targets during the initialization, thus before the mission starts. By defaults, the global IWA = minimum(mode\_IWAs) and global OWA = maximum(mode\_OWAs). However, the user can specify a global IWA that is very small or even zero to avoid filtering out targets during initialization, without affecting the detection IWA described above.
 
 The input and output of the Optical System methods are depicted in \reffig{fig:opticalsysmodule}. The Optical System module has six methods used in simulation:
@@ -1023,6 +1023,7 @@ The \verb+Cp_Cb_Csp+ method calculates the electron count rates for planet signa
     \item[dMag (float ndarray)] \hfill \\ Differences in magnitude between planets and their host star.
     \item[WA (astropy Quantity array)] \hfill \\ Working angles of the planets of interest in units of $arcsec$
     \item[mode (dict)] \hfill \\ Selected observing mode
+     \item[TK (TimeKeeping object)] \hfill \\ Optional TimeKeeping object, see \S\ref{sec:timekeeping} for attributes. 
 \end{description}
 \end{itemize}
 \subsubsection*{Output}
@@ -1041,13 +1042,14 @@ The \verb+calc_intTime+ method calculates the integration time required for spec
 \begin{itemize}
 \item 
 \begin{description}
-    \item[TL (TargetList module)] \hfill \\ TargetList class object, see \S\ref{sec:targetlist} for definition of available attributes
+    \item[TL (TargetList object)] \hfill \\ TargetList class object, see \S\ref{sec:targetlist} for definition of available attributes
     \item[sInds (integer ndarray)] \hfill \\ Integer indices of the stars of interest
     \item[fZ (astropy Quantity array)] \hfill \\ Surface brightness of local zodiacal light in units of $ 1/arcsec^2 $
     \item[fEZ (astropy Quantity array)] \hfill \\ Surface brightness of exo-zodiacal light in units of $ 1/arcsec^2 $
     \item[dMag (float ndarray)] \hfill \\ Differences in magnitude between planets and their host star.
     \item[WA (astropy Quantity array)] \hfill \\ Working angles of the planets of interest in units of $ arcsec $
     \item[mode (dict)] \hfill \\ Selected observing mode
+    \item[TK (TimeKeeping object)] \hfill  \\ Optional TimeKeeping object, see \S\ref{sec:timekeeping} for attributes.  
 \end{description}
 \end{itemize}
 \subsubsection*{Output}
