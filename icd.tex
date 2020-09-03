@@ -1137,6 +1137,8 @@ The Zodiacal Light module contains methods to calculate the zodiacal light surfa
     \item[\texttt generate\_fZ] Calculates the fZ for each star in TL for 1 year (see \S\ref{sec:generatefZtask})
     \item[\texttt calcfZmax] Calculates the maximum fZ excluding keepout regions (see \S\ref{sec:calcfZmaxtask})
     \item[\texttt calcfZmin] Calculates the minimum fZ (see \S\ref{sec:calcfZmintask})
+    \item[\texttt gen\_systemnEZ] Calculates the number of exo-zodi (see \S\ref{sec:exozoditask})
+    \item[\texttt extractfZmin\_fZQuads] Extracts global minimum local zodiacal light intensity
 \end{itemize}
 
 \begin{figure}[ht]
@@ -1157,6 +1159,8 @@ The Zodiacal Light module contains methods to calculate the zodiacal light surfa
     \item[magZ (float)] \hfill \\ Zodiacal light brightness magnitude (per $ arcsec^2 $). Defaults to 23.
     \item[magEZ (float)] \hfill \\ Exo-zodiacal light brightness magnitude (per $ arcsec^2 $). Defaults to 22.
     \item[varEZ (float)] \hfill \\ Exo-zodiacal light variation (variance of log-normal distribution). Defaults to 0 (constant exo-zodiacal light).
+    \item[cachedir (string)] \hfill \\ String indicating the directory to look for and cache files in.
+    \item[commonSystemfEZ (boolean)] \hfill \\ A boolean indicating whether each star has a common number of Exozodi 
 \end{description}
 \end{itemize}
 
@@ -1170,6 +1174,7 @@ The Zodiacal Light module contains methods to calculate the zodiacal light surfa
     \item[fZ0 (astropy Quantity)] \hfill \\ Default surface brightness of zodiacal light in units of $ 1/arcsec^2 $ 
     \item[fEZ0 (astropy Quantity)] \hfill \\ Default surface brightness of exo-zodiacal light in units of $ 1/arcsec^2 $ 
     \item[cachedir (string)] \hfill \\ Path to cache directory
+    \item[nEZ (list)] \hfill \\ a list of number of exo-zodi
 \end{description}
 \end{itemize}
 
@@ -1214,6 +1219,25 @@ The \verb+fEZ+ method returns surface brightness of exo-zodiacal light for plane
 \item 
 \begin{description}
     \item[fEZ (astropy Quantity array)] \hfill \\ Surface brightness of exo-zodiacal light in units of $ 1/arcsec^2 $
+\end{description}
+\end{itemize}
+
+\subsubsection{gen\_systemnEZ Method} \label{sec:exozoditask}
+The \verb+gen\_systemfEZ+ method returns the number of exo-zodi to use in the \verb+fEZ+ method. This function is used by the Simulated Universe module to generate nEZ for each star.
+
+\subsubsection*{Input}
+\begin{itemize}
+\item 
+\begin{description}
+    \item[nStars (integer)] \hfill \\ Number of exo-zodi to generate
+\end{description}
+\end{itemize}
+
+\subsubsection*{Output}
+\begin{itemize}
+\item 
+\begin{description}
+    \item[nEZ (ndarray)] \hfill \\ An array of integers representing exozodis
 \end{description}
 \end{itemize}
 
@@ -1283,6 +1307,24 @@ Finds the minimum zodiacal light values for each star over an entire earth orbit
     \item[valfZmin [astropy Quantity array]] \hfill \\ minimum value of fZ for each star specified by sInds with units of arcsec$^{-2}$
     \item[absTimefZmin [astropy Time array]] \hfill \\ absolute time fZmin occurs for each star specified by sInds
     %\item[fZminInds [sInds]] \hfill \\ the indices as a part of 1000 where the fZminInd occurs
+\end{description}
+\end{itemize}
+
+\subsubsection{extractfZmin\_fZQuads Method} \label{sec:extractfZmin_fZQuadstask}
+Finds the minimum zodiacal light values for each star over an entire earth orbit of the sun. The prototype implementation returns a constant fZ and the current absolute time.
+\subsubsection*{Input}
+\begin{itemize}
+\item
+\begin{description}
+    \item[fZQuads (list)] \hfill \\ A list with shape [sInds][Number fZmin][4]
+\end{description}
+\end{itemize}
+\subsubsection*{Output}
+\begin{itemize}
+\item
+\begin{description}
+    \item[valfZmin [astropy Quantity array]] \hfill \\ minimum value of fZ for each star specified by sInds with units of arcsec$^{-2}$
+    \item[absTimefZmin [astropy Time array]] \hfill \\ absolute time fZmin occurs for each star specified by sInds
 \end{description}
 \end{itemize}
 
@@ -1566,6 +1608,13 @@ The TargetList module contains the following methods:
     \item[\texttt starprop] Finds target star positions vector (see \S\ref{sec:starproptask})
     \item[\texttt starMag] Calculates star visual magnitudes with B-V color (see \S\ref{sec:starMagtask})
     \item[\texttt stellarTeff] Calculates the effective stellar temperature based on B-V color (see \S\ref{sec:stellarTefftask})
+    \item[\texttt radiusFromMass] Estimates star radius from mass
+    \item[\texttt gen\_inclinations] Randomly generates star system inclinations
+    \item[\texttt dump\_catalog] Dumps the target list star properties
+    \item[\texttt constructIPACurl] Queries IPAC exoplanet archive for known planet data 
+    \item[\texttt setOfStarsWithKnownPlanets] Finds set of stars with known planets
+    \item[\texttt loadAliasFile] Loads the star name aliases from the alias pickle file in the util folder
+    \item[\texttt createKnownPlanetBoolean] Calculates booleans indicating stars with known planets 
 \end{itemize}
 
 \label{sec:targetlist}
@@ -1577,6 +1626,14 @@ The TargetList module contains the following methods:
 \begin{description}
     \item[staticStars (boolean)] \hfill \\ Boolean used to force static target positions set at mission start time.
     \item[keepStarCatalog (boolean)] \hfill \\ Boolean representing whether to delete the star catalog object after the target list is assembled (defaults to False).  If True, object reference will be available from TargetList class object.
+    %\item[fillPhotometry (boolean)] \hfill \\ 
+    %\item[explainFiltering (boolean)] \hfill \\
+    %\item[filterBinaries (boolean)] \hfill \\
+    \item[filterSubM (boolean)] \hfill \\ Defaults False. If true, removes all sub-M spectral types (L,T,Y). Note that fillPhotometry will typically fail for any stars of this type, so this should be set to True when fillPhotometry is True.
+    \item[cachedir (string)] \hfill \\ Path to cache directory.
+    \item[filter\_for\_char (boolean)] \hfill \\ TODO
+    \item[earths\_only (boolean)] \hfill \\ TODO
+    \item[getKnownPlanets (boolean)] \hfill \\ A boolean indicating whether to grab the list of known planets from IPAC and read the alias pkl file.
 \end{description}
 \end{itemize}
 
@@ -1599,6 +1656,7 @@ The TargetList module contains the following methods:
     \item[MsTrue (float ndarray)] \hfill \\ Stellar mass with an error component included in $ M_{sun} $
     \item[nStars (int)] \hfill \\ Number of target stars
     \item[cachedir (string)] \hfill \\ Path to cache directory
+    \item[I (list)] \hfill \\ A list of inclinations generated in the Simulate Universe gen\_physical\_properties method
 \end{description}
 \end{itemize}
 
@@ -1698,6 +1756,127 @@ The \verb+stellarTeff+ method calculates the effective stellar temperature based
 \end{description}
 \end{itemize}
 
+\subsubsection{radiusFromMass Method} \label{sec:radiusFromMasstask}
+The \verb+radiusFromMass+ method estimates the stellar radius from the stellar mass.
+\subsubsection*{Input}
+\begin{itemize}
+\item 
+\begin{description}
+    \item[sInds (integer ndarray)] \hfill \\ Indices of the stars of interest
+\end{description}
+\end{itemize}
+\subsubsection*{Output}
+\begin{itemize}
+\item
+\begin{description}
+    \item[starRadius (float ndarray)] \hfill \\ Star radii in sun radius units
+\end{description}
+\end{itemize}
+
+\subsubsection{gen\_inclinations Method} \label{sec:gen_inclinationstask}
+The \verb+gen\_inclinations+ method randomly generates star system inclinations using the given Irange.
+\subsubsection*{Input}
+\begin{itemize}
+\item 
+\begin{description}
+    \item[Irange (float ndarray)] \hfill \\ The range to generate inclinations over
+\end{description}
+\end{itemize}
+\subsubsection*{Output}
+\begin{itemize}
+\item
+\begin{description}
+    \item[I (float ndarray)] \hfill \\ Star system inclinations in degrees
+\end{description}
+\end{itemize}
+
+\subsubsection{dump\_catalog Method} \label{sec:dump_catalogtask}
+The \verb+dump\_catalog+ method dumps all star attributes into a dictionary for output.
+\subsubsection*{Input}
+\begin{itemize}
+\item 
+\begin{description}
+    \item[None] \hfill \\
+\end{description}
+\end{itemize}
+\subsubsection*{Output}
+\begin{itemize}
+\item
+\begin{description}
+    \item[catalog (dictionary)] \hfill \\ Dictionary of star catalog properties
+\end{description}
+\end{itemize}
+
+\subsubsection{constructIPACurl Method} \label{sec:constructIPACurltask}
+The \verb+constructIPACurl+ method constructs a url and queries the IPAC exoplanet archive for the known exoplanet data.
+\subsubsection*{Input}
+\begin{itemize}
+\item 
+\begin{description}
+    \item[tableInput (string)] \hfill \\ a string indicating which table to reference. Default=``exoplanets''.
+    \item[columnsInputList (list)] \hfill \\ List of strings indicating column headers to query.
+    \item[formatInput (string)] \hfill \\ Format of the input. Default=``json''.
+\end{description}
+\end{itemize}
+\subsubsection*{Output}
+\begin{itemize}
+\item
+\begin{description}
+    \item[data (dictionary)] \hfill \\ A dictionary of exoplanet properties
+\end{description}
+\end{itemize}
+
+\subsubsection{setOfStarsWithKnownPlanets Method} \label{sec:setOfStarsWithKnownPlanetstask}
+The \verb+setOfStarsWithKnownPlanets+ method finds the set of star names with known planets.
+\subsubsection*{Input}
+\begin{itemize}
+\item 
+\begin{description}
+    \item[data (dictionary)] \hfill \\ A dictionary of exoplanet properties
+\end{description}
+\end{itemize}
+\subsubsection*{Output}
+\begin{itemize}
+\item
+\begin{description}
+    \item[list (list)] \hfill \\ A list of names of stars with known exoplanets around them.
+\end{description}
+\end{itemize}
+
+\subsubsection{loadAliasFile Method} \label{sec:loadAliasFiletask}
+The \verb+loadAliasFile+ method loads the alias file in the EXOSIMS util folder containing different star name aliases for stars.
+\subsubsection*{Input}
+\begin{itemize}
+\item 
+\begin{description}
+    \item[None] \hfill \\
+\end{description}
+\end{itemize}
+\subsubsection*{Output}
+\begin{itemize}
+\item
+\begin{description}
+    \item[list (list)] \hfill \\ A list of star aliases.
+\end{description}
+\end{itemize}
+
+\subsubsection{createKnownPlanetBoolean Method} \label{sec:createKnownPlanetBooleantask}
+The \verb+createKnownPlanetBoolean+ method creates a numpy array of booleans the length of nStars indicating whether that star has a known planet around it.
+\subsubsection*{Input}
+\begin{itemize}
+\item 
+\begin{description}
+    \item[alias (list)] \hfill \\ A list of star name aliases
+    \item[starsWithPlanets (list)] \hfill \\ A list of stars with known planets
+\end{description}
+\end{itemize}
+\subsubsection*{Output}
+\begin{itemize}
+\item
+\begin{description}
+    \item[knownPlanetBoolean (ndarray)] \hfill \\ Boolean array indicating whether each star in the set of all stars with length nStars has a planet around them
+\end{description}
+\end{itemize}
 
 
 % SIMULATED UNIVERSE 
@@ -1716,6 +1895,7 @@ The Simulated Universe module contains the following methods:
     \item[\texttt set\_planet\_phase]
     \item[\texttt dump\_systems] Create a dictionary of planetary properties for archiving use (see \S\ref{sec:dumpsystemstask}) 
     \item[\texttt dump\_system\_params] Create a dictionary of time-dependant planet properties for a specific target (see \S\ref{sec:dumpsystemparamstask})
+    \item[\texttt load\_systems] Loads a dictionary of planetary properties into the SU object
     \item[\texttt revise\_planets\_list] Replaces Simulated Universe planet attributes with filtered values, and updates the number of planets (see \S\ref{sec:reviseplanetslisttask})
     \item[\texttt revise\_stars\_list] Revises the TargetList with filtered values, and updates the planets list accordingly (see \S\ref{sec:revisestarslisttask})
 \end{itemize}
@@ -1763,7 +1943,9 @@ The Simulated Universe module contains the following methods:
     \item[fEZ (astropy Quantity array)] \hfill \\ Surface brightness of exozodiacal light in units of $ 1/arcsec2 $, determined from \verb+ZodiacalLight.fEZ+ \S\ref{sec:fEZtask}
     \item[dMag (float ndarray)] \hfill \\ Differences in magnitude between planets and their host star
     \item[WA (astropy Quantity array)] \hfill \\ Working angles of the planets of interest in units of $arcsec$
+    \item[Min (TODO)] \hfill \\ TODO
     \item[cachedir (string)] \hfill \\ Path to cache directory
+    \item[commonSystemInclinations (None or list)] \hfill \\ If None, planet inclinations are independently drawn (same as always) If 2 item list or form [mean, standard deviation], stars have randomly drawn inclinations using Irange (see Planet Population) and deviations from this are drawn from a normal distribution with the mean commonSystemInclinations[0] and standard deviation commonSystemInclinations[0]
 \end{description}
 \end{itemize}
 
@@ -2693,7 +2875,7 @@ The Survey Simulation module contains the following methods:
     \item[scriptfile (string)] \hfill \\ JSON script file.  If not set, assumes that dictionary has been passed through specs.
     \item[nt\_flux (integer)] \hfill \\ Observation time sampling, to determine the integration time interval. Default value is 1.
     \item[nVisitsMax (integer)] \hfill \\ Maximum number of observations (in detection mode) per star. Default value is 5.
-    \item[charMargin (float)] \hfill \\ Integration time margin for characterization. Default value is 15.
+    \item[charMargin (float)] \hfill \\ Integration time margin for characterization. Default value is 0.15.
     \item[seed (integer)] \hfill \\ Random seed used to make all random number generation reproducible.
     \item[WAint (float)] \hfill \\ Working angle used for integration time calculation in units of $arcsec$.
     \item[dMagint (float)] \hfill \\ Delta magnitude used for integration time calculation.
