@@ -262,6 +262,7 @@ The JSON specification file will contain a series of objects with members enumer
 
 \begin{verbatim}
 {
+    "koAngles_SolarPanel":[56.0,124.0],
     "FAP": 3e-07,
     "FAdMag0": 15,
     "IWA": 0.15,
@@ -424,7 +425,11 @@ The JSON specification file will contain a series of objects with members enumer
             "occulter": false,
             "ohTime": 0.5,
             "optics": 0.983647,
-            "samp": 10.0
+            "samp": 10.0,
+            "koAngles_Sun":[45.0,180.0],
+            "koAngles_Earth":[45.0,180.0],
+            "koAngles_Moon":[45.0,180.0],
+            "koAngles_Small":[1.0,180.0]
         },
         {
             "BW": 0.18,
@@ -519,6 +524,9 @@ These parameters apply to all simulations. These parameters define the scope of 
 \item[constrainOrbits] (boolean) True means planetary orbits are constrained to never leave the semi-major axis range (arange).
 \item[eta] (float) The average occurrence rate of planets per star for the entire population.
 
+\item[\textbf{PlanetPhysicalModel}]
+\item[whichPlanetsPhaseFunction] (string) indicates which planet phase function to use
+
 \item[\textbf{OpticalSystem}]
 \item[obscurFac] (float) Obscuration factor due to secondary mirror and spiders.
 \item[shapeFac] (float)  Telescope aperture shape factor.
@@ -578,11 +586,11 @@ These parameters apply to all simulations. These parameters define the scope of 
 \item[keepStarCatalog] (boolean) Boolean representing whether to delete the star catalog after assembling the target list.  If true, object reference will be available from TargetList object.
 
 \item[\textbf{Observatory}]
-\item[koAngleMin] (float) Telescope minimum keepout angle in units of $deg$. 
-\item[koAngleMinMoon] (float) Telescope minimum keepout angle in units of $deg$, for the Moon only.
-\item[koAngleMinEarth] (float) Telescope minimum keepout angle in units of $deg$, for the Earth only.
-\item[koAngleMax] (float) Telescope maximum keepout angle (for occulter) in units of $deg$. 
-\item[koAngleSmall] (float) Telescope keepout angle for smaller (angular size) bodies in units of $deg$.
+\item[koAngles\_SolarPanel] (numpy array) angular region telescope can observe stars due to solar panels in units $deg$.
+\item[koAngles\_Sun] (numpy array) angular region telescope can observe stars due to Sun in units $deg$.
+\item[koAngles\_Earth] (numpy array) angular region telescope can observe stars due to Earth in units $deg$.
+\item[koAngles\_Moon] (numpy array) angular region telescope can observe stars due to Moon in units $deg$.
+\item[koAngles\_Small] (numpy array) angular region telescope can observe stars due to all other planets in units $deg$.
 \item[settlingTime] (float) Amount of time needed for observatory to settle after a repointing in units of $ day $.
 \item[thrust] (float) Occulter slew thrust in units of $ mN $.
 \item[slewIsp] (float) Occulter slew specific impulse in units of $ s $.
@@ -760,7 +768,7 @@ The methods are:
 % PLANET PHYSICAL MODEL 
 
 \subsection{Planet Physical Model} \label{sec:planetphysicalmodel}
-The Planet Physical Model module contains models of the light emitted or reflected by planets in the wavelength bands under investigation by the current mission simulation.  It takes as inputs the physical quantities sampled from the distributions in the Planet Population module and generates synthetic spectra (or band photometry, as appropriate).  The specific implementation of this module can vary greatly, and can be based on any of the many available planetary geometric albedo, spectra and phase curve models.  This module contains the attribute \texttt{cachedir}, the path to the cache directory. As required, this module also provides physical models relating dependent parameters that cannot be sampled independently (for example density models relating plant mass and radius).  While the specific methods will depend highly on the physical models being used, the prototype provides four stubs that will be commonly useful:
+The Planet Physical Model module contains models of the light emitted or reflected by planets in the wavelength bands under investigation by the current mission simulation.  It takes as inputs the physical quantities sampled from the distributions in the Planet Population module and generates synthetic spectra (or band photometry, as appropriate).  The specific implementation of this module can vary greatly, and can be based on any of the many available planetary geometric albedo, spectra and phase curve models.  This module contains the attribute \texttt{cachedir}, the path to the cache directory. This module also contains the attribute \texttt{whichPlanetPhaseFunction}, the string indicating which planet phase function model to use. As required, this module also provides physical models relating dependent parameters that cannot be sampled independently (for example density models relating plant mass and radius).  While the specific methods will depend highly on the physical models being used, the prototype provides four stubs that will be commonly useful:
 \begin{itemize}[leftmargin=2in,font={\ttfamily}]
     \item[\texttt calc\_albedo\_from\_sma] Calculate planetary geometric albedo as a function of the semi-major axis. (see \S\ref{sec:calcalbedofromsmatask})
     \item[\texttt calc\_radius\_from\_mass] Calculate planetary radii from their masses (see \S\ref{sec:calcradiusfrommasstask}).
@@ -1023,7 +1031,8 @@ The \verb+Cp_Cb_Csp+ method calculates the electron count rates for planet signa
     \item[dMag (float ndarray)] \hfill \\ Differences in magnitude between planets and their host star.
     \item[WA (astropy Quantity array)] \hfill \\ Working angles of the planets of interest in units of $arcsec$
     \item[mode (dict)] \hfill \\ Selected observing mode
-     \item[TK (TimeKeeping object)] \hfill \\ Optional TimeKeeping object, see \S\ref{sec:timekeeping} for attributes. 
+    \item[returnExtra] \hfill \\ An optional flag that allows for additional rates to be returned to aid validation.
+     \item[TK (TimeKeeping object)] \hfill \\ TimeKeeping object, see \S\ref{sec:timekeeping} for attributes (optional, defaults to None).
 \end{description}
 \end{itemize}
 \subsubsection*{Output}
@@ -1049,7 +1058,7 @@ The \verb+calc_intTime+ method calculates the integration time required for spec
     \item[dMag (float ndarray)] \hfill \\ Differences in magnitude between planets and their host star.
     \item[WA (astropy Quantity array)] \hfill \\ Working angles of the planets of interest in units of $ arcsec $
     \item[mode (dict)] \hfill \\ Selected observing mode
-    \item[TK (TimeKeeping object)] \hfill  \\ Optional TimeKeeping object, see \S\ref{sec:timekeeping} for attributes.  
+    \item[TK (TimeKeeping object)] \hfill  \\ TimeKeeping object, see \S\ref{sec:timekeeping} for attributes (optional, defaults to None)
 \end{description}
 \end{itemize}
 \subsubsection*{Output}
@@ -1092,6 +1101,9 @@ The \verb+calc_dMag_per_intTime+ method calculates the achievable planet delta m
     \item[fEZ (astropy Quantity array)] \hfill \\ Surface brightness of exo-zodiacal light in units of $ 1/arcsec^2 $
     \item[WA (astropy Quantity array)] \hfill \\ Working angles of the planets of interest in units of $ arcsec $
     \item[mode (dict)] \hfill \\ Selected observing mode
+    \item[C\_b (astropy Quantity array)] \hfill \\ Background noise electron count rate in units of 1/s (optional, defaults to None)
+    \item[C\_sp (astropy Quantity array)] \hfill \\ Residual speckle spatial structure (systematic error) in units of 1/s (optional, defaults to None)
+    \item[TK (TimeKeeping module)] \hfill \\ TimeKeeping class object (see \ref{sec:timekeeping})
 \end{description}
 \end{itemize}
 \subsubsection*{Output}
@@ -1115,6 +1127,9 @@ The \verb+ddMag_dt+ method calculates the derivative of achievable dMag with res
     \item[fEZ (astropy Quantity array)] \hfill \\ Surface brightness of exo-zodiacal light in units of $ 1/arcsec^2 $
     \item[WA (astropy Quantity array)] \hfill \\ Working angles of the planets of interest in units of $ arcsec $
     \item[mode (dict)] \hfill \\ Selected observing mode
+    \item[C\_b (astropy Quantity array)] \hfill \\ Background noise electron count rate in units of 1/s (optional, defaults to None)
+    \item[C\_sp (astropy Quantity array)] \hfill \\ Residual speckle spatial structure (systematic error) in units of 1/s (optional, defaults to None)
+    \item[TK (TimeKeeping module)] \hfill \\ TimeKeeping class object (see \ref{sec:timekeeping})
 \end{description}
 \end{itemize}
 \subsubsection*{Output}
@@ -1126,6 +1141,24 @@ The \verb+ddMag_dt+ method calculates the derivative of achievable dMag with res
 \end{itemize}
 
 
+\subsubsection{get\_param\_data} \label{sec:getparamdata}
+Used to get data for interpolants that has been stored in a fits or csv file.
+\subsubsection*{Input}
+\begin{itemize}
+\item 
+\begin{description}
+    \item[pth (string)] \hfill \\ Path to the file location, can be a string or path object
+    \item[left\_col\_name (string)] \hfill \\ Header of the column in the file that will be used as the independent variable
+    \item[param\_name (string)] \hfill \\ Header of the column that will be used as the dependent variable
+\end{description}
+\end{itemize}
+\subsubsection*{Output}
+\begin{itemize}
+\item 
+\begin{description}
+    \item[dat (ndarray)] \hfill \\ A two column numpy array with the data used to create the interpolant
+\end{description}
+\end{itemize}
 % ZODIACAL LIGHT 
 
 \subsection{Zodiacal Light}\label{sec:zodiacallight}
@@ -1547,6 +1580,7 @@ The \verb+comp_per_intTime+ method calculates the completeness values per integr
     \item[fEZ (astropy Quantity array)] \hfill \\ Surface brightness of exo-zodiacal light in units of $ 1/arcsec^2 $
     \item[WA (astropy Quantity array)] \hfill \\ Working angles of the planets of interest in units of $ arcsec $
     \item[mode (dict)] \hfill \\ Selected observing mode
+    \item[TK (TimeKeeping module)] \hfill \\ TimeKeeping class object (see \ref{sec:timekeeping})
 \end{description}
 \end{itemize}
 \subsubsection*{Output}
@@ -1572,6 +1606,7 @@ The \verb+dcomp_dt+ method calculates the derivative of completeness with respec
     \item[fEZ (astropy Quantity array)] \hfill \\ Surface brightness of exo-zodiacal light in units of $ 1/arcsec^2 $
     \item[WA (astropy Quantity array)] \hfill \\ Working angles of the planets of interest in units of $ arcsec $
     \item[mode (dict)] \hfill \\ Selected observing mode
+    \item[TK (TimeKeeping module)] \hfill \\ TimeKeeping class object (see \ref{sec:timekeeping})
 \end{description}
 \end{itemize}
 \subsubsection*{Output}
@@ -1875,6 +1910,43 @@ The \verb+createKnownPlanetBoolean+ method creates a numpy array of booleans the
 \item
 \begin{description}
     \item[knownPlanetBoolean (ndarray)] \hfill \\ Boolean array indicating whether each star in the set of all stars with length nStars has a planet around them
+\end{description}
+\end{itemize}
+
+\subsubsection{F0} \label{sec:F0}
+This function calculates the spectral flux density for a given spectral type. It assumes that the Pickles Atlas is saved to TargetList. If a spectral type is provided it tries to match based on the luminosity class and then spectral type. If there is no type or match it tries to fit based on Traub et al. 2016 (JATIS).
+\subsubsection*{Input}
+\begin{itemize}
+\item 
+\begin{description}
+    \item[BW (float)] \hfill \\ Bandwidth fraction
+    \item[lam (astropy Quantity)] \hfill \\ central wavelength in units of $nm$
+    \item[Spec (spectral type string)] \hfill \\ Should be something like G0V
+\end{description}
+\end{itemize}
+\subsubsection*{Output}
+\begin{itemize}
+\item
+\begin{description}
+    \item[F0 (astropy Quantity)] \hfill \\ The spectral flux density in uits of $ph/m**2/s/nm$
+\end{description}
+\end{itemize}
+
+\subsubsection{starF0} \label{sec:starF0}
+This returns the spectral flux density for all requested stars for the given observing mode. It caches results for faster access on subsequent calls.
+\subsubsection*{Input}
+\begin{itemize}
+\item 
+\begin{description}
+    \item[sInds (integer ndarray)] \hfill \\ Indices of the stars of interest
+    \item[mode (dict)] \hfill \\ Observing mode dictionary
+\end{description}
+\end{itemize}
+\subsubsection*{Output}
+\begin{itemize}
+\item
+\begin{description}
+    \item[F0 (astropy Quantity array)] \hfill \\ Array of spectral flux density in units of $ph/m**2/s/nm$
 \end{description}
 \end{itemize}
 
