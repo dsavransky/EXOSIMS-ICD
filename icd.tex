@@ -525,7 +525,7 @@ These parameters apply to all simulations. These parameters define the scope of 
 \item[eta] (float) The average occurrence rate of planets per star for the entire population.
 
 \item[\textbf{PlanetPhysicalModel}]
-\item[whichPlanetsPhaseFunction] (string) indicates which planet phase function to use
+\item[whichPlanetPhaseFunction] (string) indicates which planet phase function to use
 
 \item[\textbf{OpticalSystem}]
 \item[obscurFac] (float) Obscuration factor due to secondary mirror and spiders.
@@ -768,7 +768,11 @@ The methods are:
 % PLANET PHYSICAL MODEL 
 
 \subsection{Planet Physical Model} \label{sec:planetphysicalmodel}
-The Planet Physical Model module contains models of the light emitted or reflected by planets in the wavelength bands under investigation by the current mission simulation.  It takes as inputs the physical quantities sampled from the distributions in the Planet Population module and generates synthetic spectra (or band photometry, as appropriate).  The specific implementation of this module can vary greatly, and can be based on any of the many available planetary geometric albedo, spectra and phase curve models.  This module contains the attribute \texttt{cachedir}, the path to the cache directory. This module also contains the attribute \texttt{whichPlanetPhaseFunction}, the string indicating which planet phase function model to use. As required, this module also provides physical models relating dependent parameters that cannot be sampled independently (for example density models relating plant mass and radius).  While the specific methods will depend highly on the physical models being used, the prototype provides four stubs that will be commonly useful:
+The Planet Physical Model module contains models of the light emitted or reflected by planets in the wavelength bands under investigation by the current mission simulation.  It takes as inputs the physical quantities sampled from the distributions in the Planet Population module and generates synthetic spectra (or band photometry, as appropriate).  The specific implementation of this module can vary greatly, and can be based on any of the many available planetary geometric albedo, spectra and phase curve models.  This module contains the attribute \texttt{cachedir}, the path to the cache directory.
+
+This module also contains the attribute \texttt{whichPlanetPhaseFunction}, the string indicating which planet phase function model to use. These planet phase functions manifest themselves as the \texttt{calc\_Phi} method and originate from the \texttt{phaseFunctions} script in \texttt{utils}. Currently, the default is to use the Lambert phase function. Optional alternatives include \texttt{quasiLambertPhaseFunction}, \texttt{hyperbolicTangentPhaseFunc}, or \texttt{realSolarSystemPhaseFunc}.
+
+As required, this module also provides physical models relating dependent parameters that cannot be sampled independently (for example density models relating plant mass and radius).  While the specific methods will depend highly on the physical models being used, the prototype provides four stubs that will be commonly useful:
 \begin{itemize}[leftmargin=2in,font={\ttfamily}]
     \item[\texttt calc\_albedo\_from\_sma] Calculate planetary geometric albedo as a function of the semi-major axis. (see \S\ref{sec:calcalbedofromsmatask})
     \item[\texttt calc\_radius\_from\_mass] Calculate planetary radii from their masses (see \S\ref{sec:calcradiusfrommasstask}).
