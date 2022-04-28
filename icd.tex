@@ -516,7 +516,7 @@ These parameters apply to all simulations. These parameters define the scope of 
 \item[erange] (float) 1$\times$2 list of eccentricity range.
 \item[Irange] (float) 1$\times$2 list of inclination range in units of $ deg $.  
 \item[Orange] (float) 1$\times$2 list of ascension of the ascending node range in units of $ deg $.  
-\item[wrange] (float) 1$\times$2 list of argument of perigee range in units of $ deg $. 
+\item[wrange] (float) 1$\times$2 list of argument of periastron range in units of $ deg $. 
 \item[prange] (float) 1$\times$2 list of planetary geometric albedo range.  
 \item[Rprange] (float) 1$\times$2 list of planetary radius range in Earth radii.  
 \item[Mprange] (float) 1$\times$2 list of planetary mass range in Earth masses.  
@@ -595,7 +595,12 @@ These parameters apply to all simulations. These parameters define the scope of 
 \item[thrust] (float) Occulter slew thrust in units of $ mN $.
 \item[slewIsp] (float) Occulter slew specific impulse in units of $ s $.
 \item[scMass] (float) Occulter (maneuvering spacecraft) initial wet mass in units of $ kg $. 
-\item[dryMass] (float) Occulter (maneuvering spacecraft) dry mass in units of $ kg $. 
+\item[dryMass] (float) Occulter (maneuvering spacecraft) dry mass in units of $ kg $.
+\item[twotanks] (boolean) Boolean signifying if the Occulter (maneuvering spacecraft) has two separate fuel tanks. If true, decrements mass from slewMass and skMass.
+\item[slewMass] (float) Occulter (maneuvering spacecraft) initial fuel mass used for slewing in units of $ kg $.
+\item[skMass] (float) Occulter (maneuvering spacecraft) initial fuel mass used for station keeping in units of $ kg $.
+\item[slewEff] (float) Occulter slewing maneuver general efficiency factor.
+\item[skEff] (float) Occulter station keeping maneuver general efficiency factor.
 \item[coMass] (float) Telescope (or non-maneuvering spacecraft) mass in units of $ kg $. 
 \item[occulterSep] (float) Occulter-telescope distance in units of $ km $. 
 \item[skIsp] (float) Specific impulse for station keeping in units of $ s $. 
@@ -714,7 +719,7 @@ The following are all entries in the passed specs dictionary (derived from the J
     \item[erange (float 1$\times$2 array)] \hfill \\ Eccentricity range.  Default value is [0.01,0.99]
     \item[Irange (float 1$\times$2 array)] \hfill \\ Inclination range in units of $ deg $.  Default value is [0,180]
     \item[Orange (float 1$\times$2 array)] \hfill \\ Ascension of the ascending node range in units of $ deg $.  Default value is [0,360]
-    \item[wrange (float 1$\times$2 array)] \hfill \\ Perigee range in units of $ deg $.  Default value is [0,360]
+    \item[wrange (float 1$\times$2 array)] \hfill \\ Argument of periastron range in units of $ deg $.  Default value is [0,360]
     \item[prange (float 1$\times$2 array)] \hfill \\ Planetary geometric albedo range.  Default value is [0.1,0.6]
     \item[Rprange (float 1$\times$2 array)] \hfill \\ Planetary Radius in Earth radii.  Default value is [1, 30]
     \item[Mprange (float 1$\times$2 array)] \hfill \\ Planetary mass in Earth masses.  Default value is [1, 4131]
@@ -732,7 +737,7 @@ The following are all entries in the passed specs dictionary (derived from the J
     \item[erange (float 1$\times$2 ndarray)] \hfill \\ Eccentricity range defined as [e\_min, e\_max]
     \item[Irange (astropy Quantity 1$\times$2 array)] \hfill \\ Planetary orbital inclination range defined as [I\_min, I\_max] in units of $ deg $
     \item[Orange (astropy Quantity 1$\times$2 array)] \hfill \\ Right ascension of the ascending node range defined as [O\_min, O\_max] in units of $ deg $
-    \item[wrange (astropy Quantity 1$\times$2 array)] \hfill \\ Argument of perigee range defined as [w\_min, w\_max] in units of $ deg $
+    \item[wrange (astropy Quantity 1$\times$2 array)] \hfill \\ Argument of periastron range defined as [w\_min, w\_max] in units of $ deg $
     \item[prange (float 1$\times$2 ndarray)] \hfill \\ Planetary geometric albedo range defined as [p\_min, p\_max]
     \item[Rprange (astropy Quantity 1$\times$2 array)] \hfill \\ Planetary radius range defined as [R\_min, R\_max] in units of $earthRad$
     \item[Mprange (astropy Quantity 1$\times$2 array)] \hfill \\ Planetary mass range defined as [Mp\_min, Mp\_max] in units of $earthMass$
@@ -754,7 +759,7 @@ In cases where values need to be sampled jointly (for example if you have a join
 The methods are:
 \begin{itemize}[leftmargin=1.5in,font={\ttfamily}]
     \item[\texttt gen\_plan\_params] Returns values of semi-major axis (in units of $ AU $), eccentricity, geometric albedo, and planetary radius (in units of $ earthRad $)
-    \item[\texttt gen\_angles] Returns values of orbital inclination, longitude of the ascending node, and argument of perigee, all in units of $ deg $
+    \item[\texttt gen\_angles] Returns values of orbital inclination, longitude of the ascending node, and argument of periastron, all in units of $ deg $
     \item[\texttt gen\_mass] Returns planetary mass values in units of $earthMass$
     \item[\texttt dist\_sma] Provides the probability density function for the semi-major axis
     \item[\texttt dist\_eccen] Provides the probability density function for the eccentricity
@@ -2005,7 +2010,7 @@ The Simulated Universe module contains the following methods:
     \item[e (float ndarray)] \hfill \\ Planet eccentricity
     \item[I (astropy Quantity array)] \hfill \\ Planet inclination in units of $ deg $
     \item[O (astropy Quantity array)] \hfill \\ Planet right ascension of the ascending node in units of $ deg $
-    \item[w (astropy Quantity array)] \hfill \\ Planet argument of perigee in units of $ deg $
+    \item[w (astropy Quantity array)] \hfill \\ Planet argument of periastron in units of $ deg $
     \item[Min (float)] \hfill \\ Constant initial mean anomaly for all planets (optional)
     \item[M0 (astropy Quantity array)] \hfill \\ Initial mean anomaly in units of $ deg $
     \item[p (float ndarray)] \hfill \\ Planet albedo
@@ -2038,7 +2043,7 @@ The \verb+gen_physical_properties+ method generates the planetary systems for th
     \item[e (float ndarray)] \hfill \\ Planet eccentricity
     \item[I (astropy Quantity array)] \hfill \\ Planet inclination in units of $ deg $
     \item[O (astropy Quantity array)] \hfill \\ Planet right ascension of the ascending node in units of $ deg $
-    \item[w (astropy Quantity array)] \hfill \\ Planet argument of perigee in units of $ deg $
+    \item[w (astropy Quantity array)] \hfill \\ Planet argument of periastron in units of $ deg $
     \item[M0 (astropy Quantity array)] \hfill \\ Initial mean anomaly in units of $ deg $
     \item[p (float ndarray)] \hfill \\ Planet albedo
     \item[Mp (astropy Quantity array)] \hfill \\ Planet mass in units of $earthMass$
@@ -2229,6 +2234,11 @@ In addition to these methods, the observatory definition can also encode finite 
     \item[slewIsp (float)] \hfill \\ Occulter slew specific impulse in units of $ s $. Default value is 4160.
     \item[scMass (float)] \hfill \\ Occulter (maneuvering spacecraft) initial wet mass in units of $ kg $. Default value is 6000.
     \item[dryMass (float)] \hfill \\ Occulter (maneuvering spacecraft) dry mass in units of $ kg $. Default value is 3400.
+    \item[slewMass (float)] \hfill \\ Occulter (maneuvering spacecraft) initial fuel mass used for slewing in units of $ kg $. Default value is 0.
+    \item[skMass (float)] \hfill \\ Occulter (maneuvering spacecraft) initial fuel mass used for station keeping in units of $ kg $. Default value is 0.
+    \item[twotanks (boolean)] \hfill \\ Boolean signifying if the Occulter (maneuvering spacecraft) has two separate fuel tanks. If true, decrements mass from slewMass and skMass. Default value is False.
+    \item[slewEff (float)] \hfill \\ Occulter slewing maneuver general efficiency factor. Default value is 1.0.
+    \item[skEff (float)] \hfill \\ Occulter station keeping maneuver general efficiency factor. Default value is 0.7098.
     \item[coMass (float)] \hfill \\ Telescope (or non-maneuvering spacecraft) mass in units of $ kg $. Default value is 5800.
     \item[occulterSep (float)] \hfill \\ Occulter-telescope distance in units of $ km $. Default value is 55000.
     \item[skIsp (float)] \hfill \\ Specific impulse for station keeping in units of $ s $. Default value is 220.
@@ -2259,6 +2269,11 @@ In addition to these methods, the observatory definition can also encode finite 
     \item[slewIsp (astropy Quantity)] \hfill \\ Occulter slew specific impulse in units of $ s $
     \item[scMass (astropy Quantity)] \hfill \\ Occulter (maneuvering spacecraft) initial wet mass in units of $ kg $
     \item[dryMass (astropy Quantity)] \hfill \\ Occulter (maneuvering spacecraft) dry mass in units of $ kg $
+    \item[slewMass (astropy Quantity)] \hfill \\ Occulter (maneuvering spacecraft) fuel mass used for slewing in units of $ kg $
+    \item[skMass (astropy Quantity)] \hfill \\ Occulter (maneuvering spacecraft) fuel mass used for station keeping in units of $ kg $
+    \item[twotanks (boolean)] \hfill \\ Boolean signifying if the Occulter (maneuvering spacecraft) has two separate fuel tanks
+    \item[slewEff (float)] \hfill \\ Occulter slewing maneuver general efficiency factor
+    \item[skEff (float)] \hfill \\ Occulter station keeping maneuver general efficiency factor
     \item[coMass (astropy Quantity)] \hfill \\ Telescope (or non-maneuvering spacecraft) mass in units of $ kg $
     \item[occulterSep (astropy Quantity)] \hfill \\ Occulter-telescope distance in units of $ km $
     \item[skIsp (astropy Quantity)] \hfill \\ Specific impulse for station keeping in units of $ s $
@@ -3031,6 +3046,8 @@ The \verb+run_sim+ method uses the inherited modules to generate a survey simula
         \item[slew\_dV (astropy Quantity)] \hfill \\ (if occulter) Slew $\Delta$V in units of $ m/s $
         \item[slew\_mass\_used (astropy Quantity)] \hfill \\ (if occulter) Slew fuel mass used in units of $ kg $
         \item[sc\_mass (float)] \hfill \\ (if occulter) Maneuvering spacecraft mass at the end of target observation in units of $kg$
+        \item[slew\_mass (float)] \hfill \\ (if occulter and twotanks) Slew fuel tank mass at the end of target observation in units of $kg$.
+        \item[sk\_mass (float)] \hfill \\ (if occulter and twotanks) Station keeping fuel tank mass at end of target observation in units of $kg$.
         \item[det\_dV (astropy Quantity)] \hfill \\ (if occulter) Detection station-keeping $\Delta$V in units of $ m/s $
         \item[det\_mass\_used (astropy Quantity)] \hfill \\ (if occulter) Detection station-keeping fuel mass used in units of $ kg $
         \item[det\_dF\_lateral (astropy Quantity)] \hfill \\ (if occulter) Detection station-keeping lateral disturbance force on occulter in units of $ N $
