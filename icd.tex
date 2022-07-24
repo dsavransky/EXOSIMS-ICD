@@ -1180,7 +1180,7 @@ The Zodiacal Light module contains methods to calculate the zodiacal light surfa
     \item[\texttt calcfZmax] Calculates the maximum fZ excluding keepout regions (see \S\ref{sec:calcfZmaxtask})
     \item[\texttt calcfZmin] Calculates the minimum fZ (see \S\ref{sec:calcfZmintask})
     \item[\texttt gen\_systemnEZ] Calculates the number of exo-zodi (see \S\ref{sec:exozoditask})
-    \item[\texttt extractfZmin\_fZQuads] Extracts global minimum local zodiacal light intensity
+    \item[\texttt extractfZmin\_fZQuads] Extracts global minimum local zodiacal light intensity 
 \end{itemize}
 
 \begin{figure}[ht]
@@ -1216,7 +1216,9 @@ The Zodiacal Light module contains methods to calculate the zodiacal light surfa
     \item[fZ0 (astropy Quantity)] \hfill \\ Default surface brightness of zodiacal light in units of $ 1/arcsec^2 $ 
     \item[fEZ0 (astropy Quantity)] \hfill \\ Default surface brightness of exo-zodiacal light in units of $ 1/arcsec^2 $ 
     \item[cachedir (string)] \hfill \\ Path to cache directory
-    \item[nEZ (list)] \hfill \\ a list of number of exo-zodi
+    \item[nEZ (list)] \hfill \\ a list of number of exo-zodi % This does not exist in ZL now, or if it does, this is not the name anymore **NEW**
+    \item[commonSystemfEZ (boolean)] \hfill \\ A boolean indicating whether each star has a common number of Exozodi % There's also a line missing for commonSystemfEZ **NEW**
+    \item[fZminglobal (astropy Quantity)] \hfill \\ Default global possible local zodical light minimum ignoring any constraints in units of $ 1/arcsec^2 $ % **NEW**
 \end{description}
 \end{itemize}
 
@@ -3005,8 +3007,12 @@ The Survey Simulation module contains the following methods:
     \item[WAint (astropy Quantity array)] \hfill \\ Working angle used for integration time calculation in units of $arcsec$
     \item[dMagint (float ndarray)] \hfill \\ Delta magnitude used for integration time calculation
     \item[valfZmin (astropy Quantity array)] \hfill \\ value of minimum zodiacal light with units 1/arcsec$^2$
-    \item[absTimefZmin (astropy Time array)] \hfill \\ absolute time in MJD and tai that minimum zodiacal light will occur next
+    \item[absTimefZmin (astropy Time array)] \hfill \\ absolute time in MJD that minimum zodiacal light will occur next
     \item[cachedir (string)] \hfill \\ Path to cache directory
+    \item[fZMap (dict)] \hfill \\ Contains the fZ values (in units of $1/arcsec^2$) for each star in the Target List over an entire orbit of the sun for each system mode % **NEW**
+    \item[fZQuads (dict)] \hfill \\ Contains the list of zodiacal light minimums (in units of $1/arcsec^2$) for each star and the times (in units of days in MJD) they occur at for each system mode % **NEW**
+    \item[integrationFilterTimes (astropy Quantity array)] \hfill \\ integration times of the stars (in absolute time in MJD) % **NEW** ******CHANGE THE NAME OF THIS IN EXOSIMS. THE GREP IS SET UP WITH THE LIST OF FILES*******
+    \item[integrationFilterInds (integer ndarray)] \hfill \\ indices of the viable stars after filtering based on integration time % **NEW**
 \end{description}
 \end{itemize}
 
